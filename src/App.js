@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import AceEditor from "react-ace";
 
 import { Button, Spin } from "antd";
-import { Select, notification } from "antd";
-import { Row, Col } from "antd";
+import { Select, notification, Input } from "antd";
+import { Layout } from "antd";
 
 import "./App.css";
 
@@ -22,6 +22,8 @@ import Axios from "axios";
 
 let prod = true;
 const { Option } = Select;
+const {  Footer, Content } = Layout;
+const { TextArea } = Input;
 
 const axinst = Axios.create({
   baseURL: prod
@@ -74,6 +76,7 @@ export default class App extends Component {
     ],
     selectedMode: 0,
     loading: false,
+    stdin: "",
   };
 
   onChange = (value, selectedMode) => {
@@ -134,137 +137,135 @@ export default class App extends Component {
 
   render() {
     return (
-      <div>
-        <Row >
-          <Col span={24}>
-            <Select
-              defaultValue={this.state.modes[this.state.selectedMode].name}
-              style={{ width: 120 }}
-              onChange={(value) => this.setState({ selectedMode: value })}
-            >
-              {this.state.modes.map((mode, ind) => {
-                return (
-                  <Option key={ind} value={ind}>
-                    {mode.name}
-                  </Option>
-                );
-              })}
-            </Select>
-          </Col>
-        </Row>
+      <div style={{ height: "90vh" }}>
+        <Layout>
+          <Content>
+            <div className="d-flex justify-content-around align-items-center">
+              <div className="d-flex flex-column align-items-center justify-content-around">
+                <div className="my-2">
+                  <Select
+                    defaultValue={
+                      this.state.modes[this.state.selectedMode].name
+                    }
+                    style={{ width: 120 }}
+                    onChange={(value) => this.setState({ selectedMode: value })}
+                  >
+                    {this.state.modes.map((mode, ind) => {
+                      return (
+                        <Option key={ind} value={ind}>
+                          {mode.name}
+                        </Option>
+                      );
+                    })}
+                  </Select>
+                </div>
 
-        <Row  justify="center">
-          <Col  span={10}>
-            {" "}
-            <AceEditor
-              placeholder="Online IDE developed by Sibi Sharanyan"
-              mode={this.state.modes[this.state.selectedMode].value}
-              theme="monokai"
-              name="blah2"
-              onLoad={this.onLoad}
-              onChange={(value) =>
-                this.onChange(value, this.state.selectedMode)
-              }
-              fontSize={14}
-              showPrintMargin={true}
-              showGutter={true}
-              highlightActiveLine={true}
-              value={this.state.modes[this.state.selectedMode].defaultCode}
-              setOptions={{
-                enableBasicAutocompletion: true,
-                enableLiveAutocompletion: true,
-                enableSnippets: true,
-                showLineNumbers: true,
-                tabSize: 2,
-              }}
-            />
-          </Col>
+                <div className="">
+                  <AceEditor
+                    height="75vh"
+                    width="60vw"
+                    placeholder="Online IDE developed by Sibi Sharanyan"
+                    mode={this.state.modes[this.state.selectedMode].value}
+                    theme="monokai"
+                    name="blah2"
+                    onLoad={this.onLoad}
+                    onChange={(value) =>
+                      this.onChange(value, this.state.selectedMode)
+                    }
+                    fontSize={14}
+                    showPrintMargin={true}
+                    showGutter={true}
+                    highlightActiveLine={true}
+                    value={
+                      this.state.modes[this.state.selectedMode].defaultCode
+                    }
+                    setOptions={{
+                      enableBasicAutocompletion: true,
+                      enableLiveAutocompletion: true,
+                      enableSnippets: true,
+                      showLineNumbers: true,
+                      tabSize: 4,
+                      showPrintMargin: false,
+                    }}
+                  />
+                </div>
 
-          <Col span={6}>
-            <Row>
-              <Col span={24}>
-                <div className="form-group">
+                <div className="my-2 d-flex align-items-center justify-content-around">
+                  <Button
+                    disabled={this.state.loading}
+                    onClick={() => this.runCode()}
+                    type="primary"
+                  >
+                    Compile and Run
+                  </Button>
+
+                  <Spin className="ml-4" spinning={this.state.loading} />
+                </div>
+              </div>
+
+              <div className="">
+                <div style = {{width: "30vw"}}  className="form-group">
                   <label htmlFor="exampleFormControlTextarea1">
                     Enter input
                   </label>
-                  <textarea
-                    className="form-control"
-                    id="exampleFormControlTextarea1"
-                    rows="7"
+
+                  <TextArea
                     value={this.state.stdin}
                     onChange={(e) => this.setState({ stdin: e.target.value })}
-                  ></textarea>
+                    rows={10}
+                    
+                  />
                 </div>
-              </Col>
-            </Row>
 
-            <Row>
-              <Col span={24}>
-                <div className="form-group">
+                <div style = {{width: "30vw"}}  className="form-group">
                   <label htmlFor="exampleFormControlTextarea2">Output</label>
-                  <textarea
-                    className="form-control"
-                    id="exampleFormControlTextarea2"
-                    rows="7"
-                    value={this.state.stdout}
-                    readOnly
-                  ></textarea>
+
+                  <TextArea   readOnly value={this.state.stdout} rows={10} />
                 </div>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
+              </div>
+            </div>
+          </Content>
+          <Footer>
+            <div className="d-flex flex-column justify-content-center">
+              <div className=" d-flex flex-column align-items-center justify-content-center">
+                <div>
+                  <p className="lead">
+                    Made with <a style={{ color: "black" }} href="https://nodejs.org/"> <i class="mx-1 fab fa-node-js"></i> </a>  and <a href="https://www.docker.com/"> <i style={{ color: "black" }} class="mx-1 fab fa-docker"></i> </a>  by <strong> Sibi </strong>{" "}
+                  </p>
+                </div>
 
-        <Row>
-          <Col span={6}>
-            <Button
-              disabled={this.state.loading}
-              onClick={() => this.runCode()}
-              type="primary"
-            >
-              Compile and Run
-            </Button>
-          </Col>
+                <div className="w-25 d-flex justify-content-between align-items-center">
+                  <div>
+                    <a
+                      style={{ color: "black" }}
+                      href="https://github.com/sibi-sharanyan"
+                    >
+                      <i class="fab fa-github fa-2x"></i>
+                    </a>
+                  </div>
 
-          <Col span={6}>
-            <Spin className="mt-2" spinning={this.state.loading} />
-          </Col>
-        </Row>
+                  <div>
+                    <a
+                      style={{ color: "black" }}
+                      href="https://www.linkedin.com/in/sibi-sharanyan"
+                    >
+                      <i class="fab fa-linkedin fa-2x"></i>
+                    </a>
+                  </div>
 
-        <Row justify="center">
-         
-        <Col span={5}>
-              <p className="lead">Made by Sibi Sharanyan</p>
-             </Col>
-
-          <Col span={1}>
-            <a style = {{color: "black"}} href="https://github.com/sibi-sharanyan">
-
-            <i class="fab fa-github fa-2x"></i>
-
-            </a>
-             </Col>
-
-             <Col span={1}>
-            <a style = {{color: "black"}} href="https://www.linkedin.com/in/sibi-sharanyan">
-
-            <i class="fab fa-linkedin fa-2x"></i>
-
-            </a>
-             </Col>
-
-             <Col span={1}>
-            <a style = {{color: "black"}} href="mailto:sibisharanyanit@gmail.com">
-
-            <i class="fas fa-envelope fa-2x"></i>
-
-            </a>
-             </Col>
-
-
-
-        </Row>
-
+                  <div>
+                    <a
+                      style={{ color: "black" }}
+                      href="mailto:sibisharanyanit@gmail.com"
+                    >
+                      <i class="fas fa-envelope fa-2x"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Footer>
+        </Layout>
       </div>
     );
   }
